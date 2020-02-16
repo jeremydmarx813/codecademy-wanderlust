@@ -20,6 +20,24 @@
     color: #ffffff;
     margin: auto;
   }
+ 
+  #location-filter-header {
+    padding-top: 5px;
+    font-family: Montserrat;
+    font-size: 50px;
+    font-weight: 300;
+    letter-spacing: 1.1px;
+    text-align: center;
+    color: #ffffff;
+    margin: auto;
+  }
+
+  #category-menu {
+    padding-top: 10px;
+    width: 200px;
+    /* height: 400px; */
+    margin: 5px auto 10px auto;
+  }
   
   h3 {
     font-family: Work Sans;
@@ -53,6 +71,11 @@
   .weather h2 {
     position: relative;
     padding: 5px;
+    font-family: Montserrat;
+    font-size: 18px;
+    line-height: 0.78;
+    text-align: left;
+    color: #4a4a4a;
   }
   
   .container {
@@ -60,14 +83,7 @@
     margin: auto;
     visibility: hidden;
   }
-  
-  .weather h2 {
-    font-family: Montserrat;
-    font-size: 18px;
-    line-height: 0.78;
-    text-align: left;
-    color: #4a4a4a;
-  }
+
 
   .weather span {
     font-weight: bolder;
@@ -133,6 +149,13 @@
     justify-content: space-around;
     min-height: 250px;
   }
+
+  #details-div {
+    margin: 20px;
+    visibility: visible;
+    width: 80%;
+}
+  
   
   #weather {
     display: flex;
@@ -169,18 +192,45 @@
     color: #ffffff;
   }
 
+  #venueDetails {
+     text-align: -webkit-center;
+     margin: 20px;
+     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+     padding: 20px;
+  }
+
+  #details-div-header {
+    font-family: Montserrat;
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: 0.9px;
+    text-align: left;
+    color: #27b7c1;
+    margin: 20px;;
+  }
+ 
+.details-small-text {
+    font-weight: 100;
+    font-size: 20px;
+    line-height: .77;
+}
+
   #venueDetails h2 {
     font-family: Work Sans;
     font-size: 22px;
     font-weight: 600;
     line-height: 0.77;
     text-align: center;
-    padding-top: 5px;
+    padding: 3px 0;
   }
   
   @media (max-width: 860px) {
     main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       background-image: url('https://s3.amazonaws.com/codecademy-content/courses/intermediate-javascript-requests/wanderlust/background_photo_moble.jpg');
+      background-size: cover;
     }
   
     h1 {
@@ -188,7 +238,16 @@
       font-size: 32px;
     }
   
+    #location-filter-header {
+        padding-top: 15px;
+        padding-bottom: 10px;
+        font-size: 25px;
+      }
+
     form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       margin-top: 30px;
       padding-bottom: 10px;
     }

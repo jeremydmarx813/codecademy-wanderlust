@@ -9,6 +9,7 @@ const weatherUrl = 'https://api.openweathermap.org/data/2.5/weather';
 
 // Page Elements
 const $input = $('#city');
+const $catInput = $('#category-menu');
 const $submit = $('#button');
 const $destination = $('#destination');
 const $venueDetails = $('#venueDetails');
@@ -17,6 +18,7 @@ const $venueContainer = $('#venues');
 const $venueDivs = [$("#venue1"), $("#venue2"), $("#venue3"), $("#venue4"), $("#venue5")];
 const $weatherDiv = $("#weather1");
 const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const $bottomHalf =  $('#bottom-half');
 
 // Add AJAX functions here:
 const getVenues = async () => {
@@ -59,7 +61,7 @@ const getVenueDetails = async venueId => {
       const response = await fetch(urlToFetch);
       if(response.ok){
           const jsonResponse = await response.json();
-            // console.log(jsonResponse.response.venue.name);
+            // console.log(jsonResponse.response.venue);
         // createVenueDetailHTML(jsonResponse);
         return jsonResponse;
       }
@@ -70,42 +72,59 @@ const getVenueDetails = async venueId => {
 
 
 const testSearch = testId => {
-    $venueDetails.empty();
+    $bottomHalf.empty();
     getVenueDetails(testId).then(details => renderVenueDetails(details));
     return false;
 }
 
 // Render functions
-const renderVenues = (venues) => {
+//!!$venue divs on page need to be limited to how many venues are in filtered venues arr.  Is there a better api get method to use for venues by category?
+//!!while condition on forEach func for the filtered arr bloc?
+const renderVenues = venues => {
   let indexes = [];
-  venues.forEach((v, i) => indexes.push(i) );
-  $venueDivs.forEach($venue => {
-      // Add your code here:
-    // console.log('function scoped initial indexes arr:', indexes);
-    let tempIndex = indexes[Math.floor(Math.random() * indexes.length)];
-    // console.log('function scoped temp Index:', tempIndex);
-    const venue = venues[tempIndex];
-    const venueIdNum = venue.id;
-    // console.log(venueIdNum);
-    const venueIcon = venue.categories[0].icon;
-    const venueImgSrc = `${venueIcon.prefix}bg_64${venueIcon.suffix}`;
-    let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
-    $venue.append(venueContent);
-    $venue.click(venueIdNum, testSearch);
-    indexes.splice(indexes.indexOf(tempIndex), 1);
-    // console.log('post splice indexes arr:', indexes);
-  });
-  $destination.append(`<h2>${venues[0].location.city}</h2>`);
+  venues.forEach( (v, i) => indexes.push(i) );
+  if($catInput.val()){
+      console.log($catInput.val());
+      const filteredVenues = venues.filter(v => {
+          if(v.categories[0].name === $catInput.val()){
+              return v;
+          }
+        });  
+      $venueDivs.forEach(($venue, i) => {
+      const venue = filteredVenues[i];
+      const venueIdNum = venue.id;
+      const venueIcon = venue.categories[0].icon;
+      const venueImgSrc = `${venueIcon.prefix}bg_64${venueIcon.suffix}`;
+      let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
+      $venue.append(venueContent);
+      $venue.click(venueIdNum, testSearch);
+    });
+    $destination.append(`<h2>${filteredVenues[0].location.city}</h2>`);
+  } else {
+      $venueDivs.forEach($venue => {
+        let tempIndex = indexes[Math.floor(Math.random() * indexes.length)];
+        const venue = venues[tempIndex];
+        const venueIdNum = venue.id;
+        const venueIcon = venue.categories[0].icon;
+        const venueImgSrc = `${venueIcon.prefix}bg_64${venueIcon.suffix}`;
+        let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
+        $venue.append(venueContent);
+        $venue.click(venueIdNum, testSearch);
+        indexes.splice(indexes.indexOf(tempIndex), 1);
+      });
+      $destination.append(`<h2>${venues[0].location.city}</h2>`);
+  }
+
 }
 
 const renderVenueDetails = venueDetails => {
-  console.log(venueDetails.response.venue);
+  const imgInfo = [venueDetails.response.venue.bestPhoto.prefix, venueDetails.response.venue.bestPhoto.suffix];
   const venueName = venueDetails.response.venue.name;
   const formatPhone = venueDetails.response.venue.contact.formattedPhone;
   const twitter = venueDetails.response.venue.contact.twitter;
   const formattedAddress = venueDetails.response.venue.location.formattedAddress;
-  const appendHTML = createVenueDetailHTML(venueName, formatPhone, twitter, formattedAddress);
-  $venueDetails.append(appendHTML);
+  const appendHTML = createVenueDetailHTML(venueName, formatPhone, twitter, formattedAddress, imgInfo);
+  $bottomHalf.append(appendHTML);
 }
 
 const renderForecast = (day) => {
@@ -115,14 +134,19 @@ const renderForecast = (day) => {
   $weatherDiv.append(weatherContent);
 }
 
-const executeSearch = () => {
-  $venueDivs.forEach(venue => venue.empty());
-  $weatherDiv.empty();
-  $destination.empty();
-  $container.css("visibility", "visible");
-  getVenues().then(venues => renderVenues(venues));
-  getForecast().then(forecast => renderForecast(forecast));
-  return false;
+const executeSearch = e => {
+    if(!$input.val()){
+    e.preventDefault();
+      console.log('no city input');
+  } else {
+    $venueDivs.forEach(venue => venue.empty());
+    $weatherDiv.empty();
+    $destination.empty();
+    $container.css("visibility", "visible");
+    getVenues().then(venues => renderVenues(venues));
+    getForecast().then(forecast => renderForecast(forecast));
+    return false;
+  }
 }
 
 $submit.click(executeSearch)

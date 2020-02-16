@@ -17,13 +17,20 @@ const createVenueHTML = (name, location, iconSource) => {
         <img src="https://openweathermap.org/img/wn/${currentDay.weather[0].icon}@2x.png">`;
   }
 
-  const createVenueDetailHTML = (venueName, formatPhone, twitter, formattedAddress) => {
-    return `<h2>${venueName}</h2>
-            <h2>Phone: ${formatPhone}</h2>
-            <h2>Twitter: ${twitter}</h2>
-            <h2>Address: ${formattedAddress[0]}</h2>
-            <h2>${formattedAddress[1]}</h2>
-            <h2>${formattedAddress[2]}</h2>`;
+  const createVenueDetailHTML = (venueName, formatPhone, twitter, formattedAddress, firstImgSrc) => {
+    return ` <div id="venueDetails">
+             <div id="venue-pics">
+             <img src="${firstImgSrc[0]}400x200${firstImgSrc[1]}">
+            </div>
+            <div id="details-div">
+            <h2 id="details-div-header">${venueName}</h2>
+            <h2>Phone: <span class="details-small-text">${formatPhone}</span></h2>
+            <h2>Twitter: <span class="details-small-text">${twitter}<span></h2>
+            <h2>Address: <span class="details-small-text">${formattedAddress[0]}</span></h2>
+            <h2><span class="details-small-text">${formattedAddress[1]}</span></h2>
+            <h2><span class="details-small-text">${formattedAddress[2]}</span></h2>
+            </div>
+            </div>`;
   }
   
   const kelvinToFahrenheit = k => ((k - 273.15) * 9 / 5 + 32).toFixed(0);
