@@ -15,138 +15,131 @@ const $destination = $('#destination');
 const $venueDetails = $('#venueDetails');
 const $container = $('.container');
 const $venueContainer = $('#venues');
-const $venueDivs = [$("#venue1"), $("#venue2"), $("#venue3"), $("#venue4"), $("#venue5")];
-const $weatherDiv = $("#weather1");
-const weekDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const $bottomHalf =  $('#bottom-half');
+const $venueDivs = [ $('#venue1'), $('#venue2'), $('#venue3'), $('#venue4'), $('#venue5') ];
+const $weatherDiv = $('#weather1');
+const weekDays = [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ];
+const $bottomHalf = $('#bottom-half');
+const $topAttractions = $('#top-attractions');
+const $venueSpecifics = $('#venue-specifics');
+let venueDetailsShown = false;
 
 // Add AJAX functions here:
 const getVenues = async () => {
-  const city = $input.val();
-  const urlToFetch = `${url}${city}&limit=49&client_id=${clientId}&client_secret=${clientSecret}&v=20200808`;
+	const city = $input.val();
+	const section = $catInput.val();
+	const urlToFetch = `${url}${city}&limit=49&client_id=${clientId}&client_secret=${clientSecret}&v=20200808`;
+	const urlWithCategory = `${url}${city}&section=${section}&limit=49&client_id=${clientId}&client_secret=${clientSecret}&v=20200808`;
+	
 
-try{
-  const response = await fetch(urlToFetch);
-  if(response.ok){
-    
-      const jsonResponse = await response.json();
-      
-      const venues = jsonResponse.response.groups[0].items.map(v => v.venue);
-    //   console.log(venues);
-    return venues;
-  }
-} catch(error){
-  console.log('error in getVenues func in main.js:', error);
- }
-}
+	try {
+		if(!section){
+		  const response = await fetch(urlToFetch);
+		  if (response.ok) {
+			const jsonResponse = await response.json();
+			const venues = jsonResponse.response.groups[0].items.map((v) => v.venue);
+			return venues;
+		}
+		}else {
+		  const response = await fetch(urlWithCategory);
+		  if (response.ok) {
+			const jsonResponse = await response.json();
+			const venues = jsonResponse.response.groups[0].items.map((v) => v.venue);
+			return venues;
+		  }
+		}
+
+	} catch (error) {
+		console.log('error in getVenues func in main.js:', error);
+	}
+};
 
 const getForecast = async () => {
-  const urlToFetch = `${weatherUrl}?q=${$input.val()}&APPID=${openWeatherKey}`;
-  try{
-    const response = await fetch(urlToFetch);
-    if(response.ok){
-      const jsonResponse = await response.json();
-        // console.log(jsonResponse);
-      return jsonResponse;
-    }
-  } catch(error){
-    console.log(error);
-  }
-}
+	const urlToFetch = `${weatherUrl}?q=${$input.val()}&APPID=${openWeatherKey}`;
+	try {
+		const response = await fetch(urlToFetch);
+		if (response.ok) {
+			const jsonResponse = await response.json();
+			return jsonResponse;
+		}
+	} catch (error) {
+		console.log(error);
+	}
+};
 
 const getVenueDetails = async venueId => {
-    // const location;
-    const urlToFetch = `https://api.foursquare.com/v2/venues/${venueId.data}?client_id=${clientId}&client_secret=${clientSecret}&v=20200808`;
-    try {
-      const response = await fetch(urlToFetch);
-      if(response.ok){
-          const jsonResponse = await response.json();
-            // console.log(jsonResponse.response.venue);
-        // createVenueDetailHTML(jsonResponse);
-        return jsonResponse;
-      }
-    } catch(error){
-        console.log(error);
-    }
-}
+	const urlToFetch = `https://api.foursquare.com/v2/venues/${venueId.data}?client_id=${clientId}&client_secret=${clientSecret}&v=20200808`;
+	try {
+		const response = await fetch(urlToFetch);
+		if (response.ok) {
+			const jsonResponse = await response.json();
+			return jsonResponse;
+		}
+	} catch (error) {
+		console.log(error);
+	}
+};
 
-
-const testSearch = testId => {
-    $bottomHalf.empty();
-    getVenueDetails(testId).then(details => renderVenueDetails(details));
-    return false;
-}
+const venueDetailsSearch = venueId => {
+	$venueSpecifics.empty();
+	getVenueDetails(venueId).then((details) => renderVenueDetails(details));
+	$venueSpecifics.show();
+	return false;
+};
 
 // Render functions
-//!!$venue divs on page need to be limited to how many venues are in filtered venues arr.  Is there a better api get method to use for venues by category?
-//!!while condition on forEach func for the filtered arr bloc?
-const renderVenues = venues => {
-  let indexes = [];
-  venues.forEach( (v, i) => indexes.push(i) );
-  if($catInput.val()){
-      console.log($catInput.val());
-      const filteredVenues = venues.filter(v => {
-          if(v.categories[0].name === $catInput.val()){
-              return v;
-          }
-        });  
-      $venueDivs.forEach(($venue, i) => {
-      const venue = filteredVenues[i];
-      const venueIdNum = venue.id;
-      const venueIcon = venue.categories[0].icon;
-      const venueImgSrc = `${venueIcon.prefix}bg_64${venueIcon.suffix}`;
-      let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
-      $venue.append(venueContent);
-      $venue.click(venueIdNum, testSearch);
-    });
-    $destination.append(`<h2>${filteredVenues[0].location.city}</h2>`);
-  } else {
-      $venueDivs.forEach($venue => {
-        let tempIndex = indexes[Math.floor(Math.random() * indexes.length)];
-        const venue = venues[tempIndex];
-        const venueIdNum = venue.id;
-        const venueIcon = venue.categories[0].icon;
-        const venueImgSrc = `${venueIcon.prefix}bg_64${venueIcon.suffix}`;
-        let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
-        $venue.append(venueContent);
-        $venue.click(venueIdNum, testSearch);
-        indexes.splice(indexes.indexOf(tempIndex), 1);
-      });
-      $destination.append(`<h2>${venues[0].location.city}</h2>`);
-  }
+const renderVenues = (venues) => {
+	let indexes = [];
+	venues.forEach((v, i) => indexes.push(i));
+		$venueDivs.forEach(($venue) => {
+			let tempIndex = indexes[Math.floor(Math.random() * indexes.length)];
+			const venue = venues[tempIndex];
+			const venueIdNum = venue.id;
+			const venueIcon = venue.categories[0].icon;
+			const venueImgSrc = `${venueIcon.prefix}bg_64${venueIcon.suffix}`;
+			let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
+			$venue.append(venueContent);
+			$venue.click(venueIdNum, venueDetailsSearch);
+			indexes.splice(indexes.indexOf(tempIndex), 1);
+		});
+		$destination.append(`<h2>${venues[0].location.city}</h2>`);
 
-}
+};
 
-const renderVenueDetails = venueDetails => {
-  const imgInfo = [venueDetails.response.venue.bestPhoto.prefix, venueDetails.response.venue.bestPhoto.suffix];
-  const venueName = venueDetails.response.venue.name;
-  const formatPhone = venueDetails.response.venue.contact.formattedPhone;
-  const twitter = venueDetails.response.venue.contact.twitter;
-  const formattedAddress = venueDetails.response.venue.location.formattedAddress;
-  const appendHTML = createVenueDetailHTML(venueName, formatPhone, twitter, formattedAddress, imgInfo);
-  $bottomHalf.append(appendHTML);
-}
+const renderVenueDetails = (venueDetails) => {
+	$topAttractions.hide();
+
+	$venueSpecifics.empty();
+    console.log('rendervenueDetails block');
+	const imgInfo = [ venueDetails.response.venue.bestPhoto.prefix, venueDetails.response.venue.bestPhoto.suffix ];
+	const venueName = venueDetails.response.venue.name;
+	const formatPhone = venueDetails.response.venue.contact.formattedPhone;
+	const twitter = venueDetails.response.venue.contact.twitter;
+	const formattedAddress = venueDetails.response.venue.location.formattedAddress;
+	const appendHTML = createVenueDetailHTML(venueName, formatPhone, twitter, formattedAddress, imgInfo);
+	$venueSpecifics.append(appendHTML);
+};
 
 const renderForecast = (day) => {
-  // Add your code here:
-  
-  let weatherContent = createWeatherHTML(day);
-  $weatherDiv.append(weatherContent);
-}
+	let weatherContent = createWeatherHTML(day);
+	$weatherDiv.append(weatherContent);
+};
+//!!after initial search, each individual venue details are being shown if just one is clicked
+const executeSearch = (e) => {
+	if (!$input.val()) {
+		e.preventDefault();
+		console.log('no city input');
+	} else {
+		$venueSpecifics.empty();
+		$venueSpecifics.hide();
+		$topAttractions.show();
+		$venueDivs.forEach((venue) => venue.empty());
+		$weatherDiv.empty();
+		$destination.empty();
+		$container.css('visibility', 'visible');
+		getVenues().then((venues) => renderVenues(venues));
+		getForecast().then((forecast) => renderForecast(forecast));
+		return false;
+	}
+};
 
-const executeSearch = e => {
-    if(!$input.val()){
-    e.preventDefault();
-      console.log('no city input');
-  } else {
-    $venueDivs.forEach(venue => venue.empty());
-    $weatherDiv.empty();
-    $destination.empty();
-    $container.css("visibility", "visible");
-    getVenues().then(venues => renderVenues(venues));
-    getForecast().then(forecast => renderForecast(forecast));
-    return false;
-  }
-}
-
-$submit.click(executeSearch)
+$submit.click(executeSearch);
