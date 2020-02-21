@@ -29,25 +29,23 @@ const getVenues = async () => {
 	const section = $catInput.val();
 	const urlToFetch = `${url}${city}&limit=49&client_id=${clientId}&client_secret=${clientSecret}&v=20200808`;
 	const urlWithCategory = `${url}${city}&section=${section}&limit=49&client_id=${clientId}&client_secret=${clientSecret}&v=20200808`;
-	
 
 	try {
-		if(!section){
-		  const response = await fetch(urlToFetch);
-		  if (response.ok) {
-			const jsonResponse = await response.json();
-			const venues = jsonResponse.response.groups[0].items.map((v) => v.venue);
-			return venues;
+		if (!section) {
+			const response = await fetch(urlToFetch);
+			if (response.ok) {
+				const jsonResponse = await response.json();
+				const venues = jsonResponse.response.groups[0].items.map((v) => v.venue);
+				return venues;
+			}
+		} else {
+			const response = await fetch(urlWithCategory);
+			if (response.ok) {
+				const jsonResponse = await response.json();
+				const venues = jsonResponse.response.groups[0].items.map((v) => v.venue);
+				return venues;
+			}
 		}
-		}else {
-		  const response = await fetch(urlWithCategory);
-		  if (response.ok) {
-			const jsonResponse = await response.json();
-			const venues = jsonResponse.response.groups[0].items.map((v) => v.venue);
-			return venues;
-		  }
-		}
-
 	} catch (error) {
 		console.log('error in getVenues func in main.js:', error);
 	}
@@ -66,7 +64,7 @@ const getForecast = async () => {
 	}
 };
 
-const getVenueDetails = async venueId => {
+const getVenueDetails = async (venueId) => {
 	const urlToFetch = `https://api.foursquare.com/v2/venues/${venueId.data}?client_id=${clientId}&client_secret=${clientSecret}&v=20200808`;
 	try {
 		const response = await fetch(urlToFetch);
@@ -79,7 +77,7 @@ const getVenueDetails = async venueId => {
 	}
 };
 
-const venueDetailsSearch = venueId => {
+const venueDetailsSearch = (venueId) => {
 	$venueSpecifics.empty();
 	getVenueDetails(venueId).then((details) => renderVenueDetails(details));
 	$venueSpecifics.show();
@@ -90,26 +88,25 @@ const venueDetailsSearch = venueId => {
 const renderVenues = (venues) => {
 	let indexes = [];
 	venues.forEach((v, i) => indexes.push(i));
-		$venueDivs.forEach(($venue) => {
-			let tempIndex = indexes[Math.floor(Math.random() * indexes.length)];
-			const venue = venues[tempIndex];
-			const venueIdNum = venue.id;
-			const venueIcon = venue.categories[0].icon;
-			const venueImgSrc = `${venueIcon.prefix}bg_64${venueIcon.suffix}`;
-			let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
-			$venue.append(venueContent);
-			$venue.click(venueIdNum, venueDetailsSearch);
-			indexes.splice(indexes.indexOf(tempIndex), 1);
-		});
-		$destination.append(`<h2>${venues[0].location.city}</h2>`);
-
+	$venueDivs.forEach(($venue) => {
+		let tempIndex = indexes[Math.floor(Math.random() * indexes.length)];
+		const venue = venues[tempIndex];
+		const venueIdNum = venue.id;
+		const venueIcon = venue.categories[0].icon;
+		const venueImgSrc = `${venueIcon.prefix}bg_64${venueIcon.suffix}`;
+		let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
+		$venue.append(venueContent);
+		$venue.click(venueIdNum, venueDetailsSearch);
+		indexes.splice(indexes.indexOf(tempIndex), 1);
+	});
+	$destination.append(`<h2>${venues[0].location.city}</h2>`);
 };
 
 const renderVenueDetails = (venueDetails) => {
 	$topAttractions.hide();
 
 	$venueSpecifics.empty();
-    console.log('rendervenueDetails block');
+	// console.log('rendervenueDetails block');
 	const imgInfo = [ venueDetails.response.venue.bestPhoto.prefix, venueDetails.response.venue.bestPhoto.suffix ];
 	const venueName = venueDetails.response.venue.name;
 	const formatPhone = venueDetails.response.venue.contact.formattedPhone;
