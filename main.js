@@ -21,7 +21,7 @@ const weekDays = [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frid
 const $bottomHalf = $('#bottom-half');
 const $topAttractions = $('#top-attractions');
 const $venueSpecifics = $('#venue-specifics');
-let venueDetailsShown = false;
+// let venueDetailsShown = false;
 
 // Add AJAX functions here:
 const getVenues = async () => {
@@ -97,6 +97,7 @@ const renderVenues = (venues) => {
 		let venueContent = createVenueHTML(venue.name, venue.location, venueImgSrc);
 		$venue.append(venueContent);
 		$venue.click(venueIdNum, venueDetailsSearch);
+		// $venue.click($venue,  $venueSpecifics.empty());
 		indexes.splice(indexes.indexOf(tempIndex), 1);
 	});
 	$destination.append(`<h2>${venues[0].location.city}</h2>`);
