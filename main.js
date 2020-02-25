@@ -78,9 +78,9 @@ const getVenueDetails = async (venueId) => {
 };
 
 const venueDetailsSearch = (venueId) => {
-	$venueSpecifics.empty();
+	// $venueSpecifics.empty();
 	getVenueDetails(venueId).then((details) => renderVenueDetails(details));
-	$venueSpecifics.show();
+	
 	return false;
 };
 
@@ -105,9 +105,8 @@ const renderVenues = (venues) => {
 
 const renderVenueDetails = (venueDetails) => {
 	$topAttractions.hide();
-
-	$venueSpecifics.empty();
-	// console.log('rendervenueDetails block');
+    $venueSpecifics.empty();
+	
 	const imgInfo = [ venueDetails.response.venue.bestPhoto.prefix, venueDetails.response.venue.bestPhoto.suffix ];
 	const venueName = venueDetails.response.venue.name;
 	const formatPhone = venueDetails.response.venue.contact.formattedPhone;
@@ -115,6 +114,7 @@ const renderVenueDetails = (venueDetails) => {
 	const formattedAddress = venueDetails.response.venue.location.formattedAddress;
 	const appendHTML = createVenueDetailHTML(venueName, formatPhone, twitter, formattedAddress, imgInfo);
 	$venueSpecifics.append(appendHTML);
+	$venueSpecifics.show();
 };
 
 const renderForecast = (day) => {
@@ -127,7 +127,7 @@ const executeSearch = (e) => {
 		e.preventDefault();
 		console.log('no city input');
 	} else {
-		$venueSpecifics.empty();
+		// $venueSpecifics.empty();
 		$venueSpecifics.hide();
 		$topAttractions.show();
 		$venueDivs.forEach((venue) => venue.empty());
