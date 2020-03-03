@@ -80,7 +80,7 @@ const getVenueDetails = async (venueId) => {
 const venueDetailsSearch = (venueId) => {
 	// $venueSpecifics.empty();
 	getVenueDetails(venueId).then((details) => renderVenueDetails(details));
-	
+
 	return false;
 };
 
@@ -105,8 +105,8 @@ const renderVenues = (venues) => {
 
 const renderVenueDetails = (venueDetails) => {
 	$topAttractions.hide();
-    $venueSpecifics.empty();
-	
+	$venueSpecifics.empty();
+
 	const imgInfo = [ venueDetails.response.venue.bestPhoto.prefix, venueDetails.response.venue.bestPhoto.suffix ];
 	const venueName = venueDetails.response.venue.name;
 	const formatPhone = venueDetails.response.venue.contact.formattedPhone;
